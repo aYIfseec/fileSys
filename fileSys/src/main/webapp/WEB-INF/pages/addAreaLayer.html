@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+<link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+
+<div class="ml15 mt15">
+	<form class="layui-form" id="areaForm" method="post">
+		<div class="layui-form-item">
+    		<label class="layui-form-label">上级区域名</label>
+    		<div class="layui-input-inline">
+	    		<input value="${parentName!}" type="text" readonly="readonly" class="layui-input" style="width:155px;">
+			</div>
+    	</div>
+		
+		<div class="layui-form-item">
+    		<label class="layui-form-label"><font color="red">*</font>下级区域名</label>
+    		<div class="layui-input-inline">
+	    		<input type="text" name="areaName" id="areaName"  style="width:155px;"
+					placeholder="请填写新增下级区域名" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+	</form>
+
+</div>
+
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery.form.js" charset="utf-8"></script>
+
+<script charset="utf-8">
+	layui.use('form', function(){
+		  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+	});
+
+	var getFormData = function() {
+		var data;
+		data = $('form').serializeJson();
+		if($("#areaName").val() == '') {
+			layer.msg("请填写区域名称");
+			return;
+		}
+		return data;
+	}
+	
+	
+	//表单序列化为json
+	$(function(){
+            
+            (function($){
+                $.fn.serializeJson=function(){
+                    var serializeObj={};
+                    var array=this.serializeArray();
+                    var str=this.serialize();
+                    $(array).each(function(){
+                        if(serializeObj[this.name]){
+                            if($.isArray(serializeObj[this.name])){
+                                serializeObj[this.name].push(this.value);
+                            }else{
+                                serializeObj[this.name]=[serializeObj[this.name],this.value];
+                            }
+                        }else{
+                            serializeObj[this.name]=this.value;    
+                        }
+                    });
+                    return serializeObj;
+                };
+            })(jQuery);
+            
+        });
+</script>

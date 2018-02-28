@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="service.CommonDictMapper">
+  <resultMap id="BaseResultMap" type="entity.CommonDict">
+    <id column="code" jdbcType="VARCHAR" property="code" />
+    <result column="detail" jdbcType="VARCHAR" property="detail" />
+    <result column="descript" jdbcType="VARCHAR" property="descript" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    code, detail, descript
+  </sql>
+  
+  <select id="getDictByDescript" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_common_dict
+    where descript = #{descript,jdbcType=VARCHAR}
+  </select> 
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_common_dict
+    where code = #{code,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_common_dict
+    where code = #{code,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="entity.CommonDict">
+    insert into t_common_dict (code, detail, descript
+      )
+    values (#{code,jdbcType=VARCHAR}, #{detail,jdbcType=VARCHAR}, #{descript,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="entity.CommonDict">
+    insert into t_common_dict
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        code,
+      </if>
+      <if test="detail != null">
+        detail,
+      </if>
+      <if test="descript != null">
+        descript,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="descript != null">
+        #{descript,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="entity.CommonDict">
+    update t_common_dict
+    <set>
+      <if test="detail != null">
+        detail = #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="descript != null">
+        descript = #{descript,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where code = #{code,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="entity.CommonDict">
+    update t_common_dict
+    set detail = #{detail,jdbcType=VARCHAR},
+      descript = #{descript,jdbcType=VARCHAR}
+    where code = #{code,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,191 @@
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+<link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+
+<div class="ml15 mt15">
+	<form class="layui-form" id="userForm" method="post">
+	
+		<div class="layui-form-item">
+	    	<label class="layui-form-label"><font color="red">*</font>区域选择</label>
+	    	<div class="layui-input-inline">
+		      	<select name="area" lay-filter="selectCity">
+		        	<option value="${area.areaCode!}" selected>${area.areaName!}</option>
+		        	<#list cityAreaList as a>
+		        		<option value="${a.areaCode!}">${a.areaName!}</option>
+		        	</#list>
+		      	</select>
+	    	</div>
+		    <div class="layui-input-inline" lay-filter="selectDiv">
+		      	<select name="area" id="selectTown" lay-filter="selectTown">
+		        	<option value="">请选择乡镇</option>
+		      	</select>
+		    </div>
+	  	</div>
+		
+		<div class="layui-form-item">
+    		<label class="layui-form-label"><font color="red">*</font>用户名</label>
+    		<div class="layui-input-inline">
+	    		<input type="text" name="loginName" id="loginName" 
+					placeholder="用户名" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+    	
+    	<div class="layui-form-item">
+    		<label class="layui-form-label"><font color="red">*</font>用户密码</label>
+    		<div class="layui-input-inline">
+	    		<input type="password" name="loginPwd" id="loginPwd"  
+					placeholder="用户密码" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+    	
+    	<div class="layui-form-item">
+    		<label class="layui-form-label"><font color="red">*</font>确认密码</label>
+    		<div class="layui-input-inline">
+	    		<input type="password" name="loginPwdConfirm" id="loginPwdConfirm"  
+					placeholder="确认用户密码" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+    	
+    	<div class="layui-form-item">
+    		<label class="layui-form-label"><font color="red">*</font>手机号码</label>
+    		<div class="layui-input-inline">
+	    		<input type="text" name="phoneNum" id="phoneNum" onblur="confirmTel(this)"
+					placeholder="手机号码" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+    	
+    	<div class="layui-form-item">
+    		<label class="layui-form-label">真实姓名</label>
+    		<div class="layui-input-inline">
+	    		<input type="text" name="realName" id="realName" 
+					placeholder="真实姓名" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+    	
+    	<div class="layui-form-item">
+    		<label class="layui-form-label">用户单位</label>
+    		<div class="layui-input-inline">
+	    		<input type="text" name="workPlace" id="workPlace" 
+					placeholder="用户单位" autocomplete="off" class="layui-input" value="">
+			</div>
+    	</div>
+	</form>
+
+	<div class ="mt15">
+		<a href="javascript:confirm()" class="layui-btn" style="margin-left:40">确认</a>
+	</div>
+</div>
+
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery.form.js" charset="utf-8"></script>
+
+<script charset="utf-8">
+	layui.use('form', function(){
+		  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+		  
+		  form.on('select(selectCity)', function(data){
+		  	$("#selectTown").empty();
+		  	var htmlStr = '<option value="">请选择乡镇</option>';
+		  	if (data.value == "0000") {
+		  		$("#selectTown").append(htmlStr);
+		  		form.render('select');
+				return;
+			}
+			$.ajax({
+				type : "POST",
+				url : '${s.base}/area/getAreaByParentCode.html',
+				data: {"parentCode": data.value },
+				dataType: 'json', 
+				success: function(data) {
+					if (data == null || data == "[]") {
+						layer.msg("无乡镇信息！",{time: 1000,offset: ['50px', '60px']});
+					} else {
+						for (var i = 0; i < data.length; i++) {
+               				htmlStr += '<option value="' + data[i].areaCode + '">' + data[i].areaName + '</option>';
+           				}
+           			}
+           			$("#selectTown").append(htmlStr);
+           			form.render('select');
+				},error:function(){
+			        	layer.msg("未响应！", {time: 1000,offset: ['50px', '60px']});  
+				}
+			});
+		  });
+	});
+
+	function confirmTel(obj) {
+		var val;
+		if (obj == null) {
+			val = $('#phoneNum').val();
+		} else {
+			val = obj.value;
+		}
+        if(/^(13|15|18)\d{9}$/i.test(val)) {
+        	return true;
+        } else {
+            layer.msg('手机号码格式不正确!');
+        }
+        return false;
+	}
+
+	function confirm(){
+		if($('#loginName') == null || $('#loginName').val().trim() == ''){
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('用户名不能为空');
+			});  
+			return;
+		}
+		
+		if($('#loginPwd').val() != $('#loginPwdConfirm').val() ){
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('两次输入的密码不一样');
+			});
+			return;
+		}
+		
+		if($('#phoneNum') == null || $('#phoneNum').val().trim() == ''){
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('手机号码不能为空');
+			});
+			return;
+		}
+		
+		if (!confirmTel(null)) {
+			return;
+		}
+		
+		var options  = {    
+			url:'${s.base}/user/addUser.html',
+			data: null,
+		    type:'post',   
+		    success:function(data){   
+		    	if (data == "true") {
+		    	    layui.use('layer', function(){
+				    	var layer = layui.layer;
+		    			layer.msg('添加成功', {icon: 1, time: 2000}, function() {
+							parent.location.reload();
+						});
+		    	    });
+		    	} else {
+		    		layui.use('layer', function(){
+				    	var layer = layui.layer;
+		    			layer.msg('添加失败', {icon: 2, time: 2000});
+		    	    });
+		    	}
+		    },
+			error:function(){
+				
+			},
+			complete:function(){
+			}
+		};
+		
+		$("form[id='userForm']").ajaxSubmit(options);
+		
+	}
+	
+
+</script>

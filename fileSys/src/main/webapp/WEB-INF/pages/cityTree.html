@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"
+	media="all" />
+	<!-- 
+<link rel="stylesheet" href="${s.base}/res/css/global.css" media="all"> -->
+<link rel="stylesheet" href="${s.base}/res/zTreecss/metroStyle/metroStyle.css" type="text/css">
+
+<style type="text/css">
+.ztree li span.button.add {margin-left:5px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}
+</style>
+</head>
+
+<body>
+	<p>&nbsp;&nbsp;&nbsp;区域结构</p>
+	<ul id="treeDemo" class="ztree"></ul>
+</body>
+			
+<script type="text/javascript" src="${s.base}/res/layui/layui.js"></script>
+<script type="text/javascript" src="${s.base}/res/zTreejs/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="${s.base}/res/zTreejs/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="${s.base}/res/zTreejs/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="${s.base}/res/zTreejs/jquery.ztree.exedit.js"></script>
+
+	<SCRIPT type="text/javascript">
+	layui.use('layer', function(){
+		var layer = layui.layer;
+	});
+		var setting = {
+			view: {
+				addHoverDom: addHoverDom,
+				removeHoverDom: removeHoverDom,
+				selectedMulti: false,
+				fontCss: {color:"#393D49"},//393D49  01AAED
+				nameIsHTML: true,	//节点名字可用HTML？
+				showLine: false 	//结构线？
+			},
+			edit: {
+				enable: true,
+				editNameSelectAll: true,
+				showRemoveBtn: true,	//显示移除按钮
+				showRenameBtn: true		//显示修改按钮
+			},
+			data: {
+				keep: {
+					parent: false		//保持父节点状态？
+				},
+				key: {
+					name : "areaName"	//节点名字
+					//url : "href"		//节点链接
+				},
+				simpleData: {
+					enable: true,
+					idKey: "areaCode",		//节点id
+					pIdKey: "parentCode",//父节点
+					rootPId: 0
+				}
+			},
+			callback: {		//回调函数定义
+				onClick: zTreeOnClick,
+				beforeEditName: beforeEditName,
+				beforeRemove: beforeRemove,
+				beforeRename: beforeRename,
+				onRemove: onRemove,
+				onRename: onRename
+			}
+		};
+
+		var zNodes = ${treeJson!};
+		var className = "dark";
+		
+		function zTreeOnClick(event, treeId, treeNode) {
+		    
+		};
+		
+		function beforeEditName(treeId, treeNode) {
+			className = (className === "dark" ? "":"dark");
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.selectNode(treeNode);
+			return true;//进入节点的编辑状态
+		}
+		
+		function beforeRemove(treeId, treeNode) {
+			className = (className === "dark" ? "":"dark");
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.selectNode(treeNode);
+			
+			parent.layer.confirm("确定要删除节点吗?", {icon: 3, title:'提示'}, function(index){
+				parent.layer.closeAll('dialog');
+				$.ajax({
+					type:"POST",
+					url:'${s.base}/area/delete.html',
+					data:{"areaCode":treeNode.areaCode},
+					success: function(data){
+						if(data == "true"){  
+			                layer.close(index);  
+			                zTree.removeNode(treeNode);
+			                layer.msg("删除成功", {time: 1000,offset: ['50px', '60px']});  
+			            } else {
+			            	layer.msg("删除失败", {time: 1000,offset: ['50px', '60px']});
+			            }
+			         },  
+			         error:function(){  
+			             layer.close(index);
+			             layer.alert("删除出错", {time: 1000,offset: ['50px', '60px']});  
+			         }
+					});
+				});
+			return false;
+		}
+		function onRemove(e, treeId, treeNode) {
+			//
+		}
+		
+		function beforeRename(treeId, treeNode, newName, isCancel) {
+			className = (className === "dark" ? "":"dark");
+			if (newName.length == 0) {
+				parent.layer.msg('区域名不能为空！',{time: 1000,offset: ['50px', '60px']});
+				return false;
+			} else if (treeNode.areaName == newName) {
+				return true;
+			} else {
+        		$.ajax({
+						type : "POST",
+						url : '${s.base}/area/updateArea.html',
+						data: {"areaCode":treeNode.areaCode,
+							   "areaName":newName},
+						success: function(data,status) {
+							console.log(data);
+							if (data == "true") {
+								parent.layer.msg('修改成功！',{time: 1000,offset: ['50px', '60px']});  
+							} else {
+								parent.layer.msg('修改失败！',{time: 1000,offset: ['50px', '60px']});  
+							}
+						}
+					});
+			}
+			return true;
+		}
+		function onRename(e, treeId, treeNode, isCancel) {
+			//
+		}
+		
+		var newCount = 1;
+		function addHoverDom(treeId, treeNode) {
+			var sObj = $("#" + treeNode.tId + "_span");
+			if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+			var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+				+ "'title='add node' onfocus='this.blur();'></span>";
+			sObj.after(addStr);
+			var btn = $("#addBtn_"+treeNode.tId);
+			if (btn) btn.bind("click", function(){
+				parent.layer.open({
+					id: 'addPage',
+	 				type: 2,
+	 				title: '新增下级',
+	 				content: ['${s.base}/area/addAreaLayer.html?parentName='+treeNode.areaName, 'no'],	//contentHTML
+	 				//skin: 'demo-class',
+	 				area: ['300px','250px'],
+	 				btn: ['保存', '取消'],
+	 				btnAlign: 'c',
+	 				yes: function(index, layero){
+	 				  var data = $(layero).find("iframe")[0].contentWindow.getFormData();
+	 				  
+	 				  if(data) {
+	 				  	parent.layer.closeAll('iframe');
+	  					var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+						var newNodeId = uuid(32,16);	//获得guid
+					 	$.ajax({
+							type : "POST",
+							content: $('areaForm'),
+							url : '${s.base}/area/addArea.html',
+							data: {"areaCode":newNodeId,
+								   "parentCode":treeNode.areaCode,
+								   "areaName":data.areaName },
+							success: function(returnData) {
+								if (returnData == "true") {
+									layer.msg('添加成功！',{time: 1000,offset: ['50px', '60px']});
+									zTree.addNodes(treeNode, {areaCode:newNodeId, pId:treeNode.id, areaName:data.areaName}); 
+								} else {
+									layer.msg('添加失败！',{time: 1000,offset: ['50px', '60px']});  
+								}
+							},error:function(){
+			             		parent.layer.msg("添加失败！", {time: 1000,offset: ['50px', '60px']});  
+			         		}
+					    });
+					  }
+     				}
+    				,btn2: function(index, layero){
+     					layer.close(index);
+     				},
+	 				//btnAlign: 'c',//按钮中间对其
+	 				shade: 0.1,//背景颜色透明度
+	 				shadeClose: false,//是否点击背景关闭, shade不为0
+	 				resize: false,
+	 				//content: '传入任意的文本或html'
+	 				
+	 			});
+	 			//alert("hello");
+				
+				//var node = zTree.getNodeByParam("orgId", newNodeId, null); //根据id找到新添加的节点 
+				//zTree.selectNode(node); //让新添加的节点处于选中状态  
+				return false;
+			});
+		};
+		function removeHoverDom(treeId, treeNode) {
+			$("#addBtn_"+treeNode.tId).unbind().remove();
+		};
+		
+		
+		function uuid(len, radix) {
+    		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    		var uuid = [], i;
+    		radix = radix || chars.length;
+    		if (len) {
+      			// Compact form
+      			for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random()*radix];
+    		} else {
+      			var r;
+      			for (i = 0; i < 36; i++) {
+        			if (!uuid[i]) {
+          				r = 0 | Math.random()*16;
+          				uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+        			}
+      			}
+    		}
+    		return uuid.join('');
+		}
+		
+		$(document).ready(function(){
+			$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+			//$("#selectAll").bind("click", selectAll);
+		});
+		//-->
+	</SCRIPT>
+</html>

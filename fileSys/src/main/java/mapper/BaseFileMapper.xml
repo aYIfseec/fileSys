@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="service.BaseFileMapper">
+  <resultMap id="BaseResultMap" type="entity.BaseFile">
+    <id column="file_id" jdbcType="VARCHAR" property="fileId" />
+    <result column="file_owner" jdbcType="VARCHAR" property="fileOwner" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="file_class" jdbcType="SMALLINT" property="fileClass" />
+    <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+    <result column="state" jdbcType="SMALLINT" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    file_id, file_owner, file_name, upload_time, path, file_class, file_type, state
+  </sql>
+  
+  <select id="searchFileByFileVo" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_file,t_user,t_area_dict 
+    where t_file.file_owner=t_user.user_id 
+    and t_user.area=t_area_dict.area_code
+    <if test="param2 != null and param2.fileId != null and param2.fileId != '' ">
+    	and file_id = #{param2.fileId}
+    </if>
+    <if test="param2 != null and param2.fileClass != null ">
+    	and file_class = #{param2.fileClass}
+    </if>
+    <if test="param2 != null and param2.fileType != null and param2.fileType != '' ">
+    	and file_type = #{param2.fileType}
+    </if>
+    <if test="param2 != null and param2.state != null ">
+    	and state = #{param2.state}
+    </if>
+    <if test="param2 != null and param2.fileOwner != null ">
+    	and file_owner = #{param2.fileOwner}
+    </if>
+    <if test="param2 != null and param2.searchKey != null and param2.searchKey != '' ">
+    	and(
+    		t_user.real_name like CONCAT ('%',#{param2.searchKey},'%')
+	        or file_name like CONCAT ('%',#{param2.searchKey},'%') 
+	    )
+    </if>
+    <if test="param2 != null and param2.areaName != null and param2.areaName != '' ">
+    	and(
+    		t_area_dict.area_code = #{param2.areaName}
+	    )
+    </if>
+    ORDER BY t_file.upload_time DESC
+    <if test="param1 != null">
+    	limit #{param1.start}, #{param1.pageSize}
+    </if>
+    	
+  </select>
+  
+  <select id="getSearchCountByFileVo" resultType="java.lang.Integer">
+  	select count(*)
+    from t_file,t_user,t_area_dict 
+    where t_file.file_owner=t_user.user_id 
+    and t_user.area=t_area_dict.area_code
+    <if test="fileId != null and fileId != '' ">
+    	and file_id = #{fileId}
+    </if>
+    <if test="fileClass != null ">
+    	and file_class = #{fileClass}
+    </if>
+    <if test="fileType != null and fileType != '' ">
+    	and file_type = #{fileType}
+    </if>
+    <if test="state != null ">
+    	and state = #{state}
+    </if>
+    <if test="fileOwner != null and fileOwner != null ">
+    	and file_owner = #{fileOwner}
+    </if>
+    <if test="searchKey != null and searchKey != '' ">
+    	and(
+    		t_user.real_name like CONCAT ('%',#{searchKey},'%')
+	        or file_name like CONCAT ('%',#{searchKey},'%') 
+	    )
+    </if>  
+    <if test="areaName != null and areaName != null and areaName != '' ">
+    	and(
+    		t_area_dict.area_code = #{areaName}
+	    )
+    </if>  
+  </select>
+  
+  <select id="getRecordCountByCondition" resultType="java.lang.String">
+  	select count(*) from t_file,t_user where
+  		t_file.file_owner = t_user.user_id and t_user.area = #{param1}
+  		<if test="param2 != null and param2 != '' and param2 != '5' ">
+  			and t_file.file_class = #{param2}
+  		</if>
+  		<if test="param3 != null and param3 !='' ">
+  			and t_file.file_type = #{param3}
+  		</if>
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_file
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_file
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="entity.BaseFile">
+    insert into t_file (file_id, file_owner, file_name, 
+      upload_time, path, file_class, 
+      file_type, state)
+    values (#{fileId,jdbcType=VARCHAR}, #{fileOwner,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, 
+      #{uploadTime,jdbcType=TIMESTAMP}, #{path,jdbcType=VARCHAR}, #{fileClass,jdbcType=SMALLINT}, 
+      #{fileType,jdbcType=VARCHAR}, #{state,jdbcType=SMALLINT})
+  </insert>
+  <insert id="insertSelective" parameterType="entity.BaseFile">
+    insert into t_file
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fileId != null">
+        file_id,
+      </if>
+      <if test="fileOwner != null">
+        file_owner,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+      <if test="uploadTime != null">
+        upload_time,
+      </if>
+      <if test="path != null">
+        path,
+      </if>
+      <if test="fileClass != null">
+        file_class,
+      </if>
+      <if test="fileType != null">
+        file_type,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fileId != null">
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileOwner != null">
+        #{fileOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="fileClass != null">
+        #{fileClass,jdbcType=SMALLINT},
+      </if>
+      <if test="fileType != null">
+        #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="entity.BaseFile">
+    update t_file
+    <set>
+      <if test="fileOwner != null">
+        file_owner = #{fileOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="path != null">
+        path = #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="fileClass != null">
+        file_class = #{fileClass,jdbcType=SMALLINT},
+      </if>
+      <if test="fileType != null">
+        file_type = #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="entity.BaseFile">
+    update t_file
+    set file_owner = #{fileOwner,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      path = #{path,jdbcType=VARCHAR},
+      file_class = #{fileClass,jdbcType=SMALLINT},
+      file_type = #{fileType,jdbcType=VARCHAR},
+      state = #{state,jdbcType=SMALLINT}
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="service.DownloadRecordMapper">
+  <resultMap id="BaseResultMap" type="entity.DownloadRecord">
+    <result column="donw_file_id" jdbcType="VARCHAR" property="donwFileId" />
+    <result column="down_user_id" jdbcType="VARCHAR" property="downUserId" />
+    <result column="down_time" jdbcType="TIMESTAMP" property="downTime" />
+  </resultMap>
+  
+  <select id="getRecordCountByAreaCode" resultType="java.lang.String">
+  	select count(*) from t_download_record, t_user, t_file 
+  		where t_download_record.down_user_id = t_user.user_id and  t_download_record.donw_file_id = t_file.file_id
+  			and t_user.area in (#{param1})
+  		<if test="param2 != null and param2 != '' and param2 != '5' ">
+  			and t_file.file_class = #{param2}
+  		</if>
+  		<if test="param3 != null and param3 !='' ">
+  			and t_file.file_type = #{param3}
+  		</if>
+  </select>
+  
+  <insert id="insert" parameterType="entity.DownloadRecord">
+    insert into t_download_record (donw_file_id, down_user_id, down_time
+      )
+    values (#{donwFileId,jdbcType=VARCHAR}, #{downUserId,jdbcType=VARCHAR}, #{downTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="entity.DownloadRecord">
+    insert into t_download_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="donwFileId != null">
+        donw_file_id,
+      </if>
+      <if test="downUserId != null">
+        down_user_id,
+      </if>
+      <if test="downTime != null">
+        down_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="donwFileId != null">
+        #{donwFileId,jdbcType=VARCHAR},
+      </if>
+      <if test="downUserId != null">
+        #{downUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="downTime != null">
+        #{downTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+
+<div class="ml15 mt15">
+	<form action="${s.base}/file/downloadFile.html" class="layui-form" id="fileForm" method="post">
+		<p style="padding:19px 39px;">&nbsp;&nbsp;&nbsp;注意：<font color="red" style="padding:0px 16px;">内部资料，仅供参考，</font><br>
+			<font color="red" style="padding:9px 70px;">请勿外传、抄袭！</font></p>
+		<div class="layui-form-item">
+			<label class="layui-form-label">文件名：</label>
+			<div class="layui-input-inline input-custom-width">
+				<input value="${path!}" name="path" type="hidden">
+				<input value="${fileName!}" id="fileName" name="fileName" type="text" class="layui-input" style="width:150px">
+			</div>
+		</div><br/>
+		
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<input id="cancel" class="layui-btn layui-btn-small layui-btn-danger" type="button" style="margin-left:-20px;" value="取消下载">
+				<button class="layui-btn layui-btn-small" lay-submit="" lay-filter="cate_add" style="margin-left:10px;">确定下载</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+
+<script charset="utf-8">
+layui.use('form', function(){
+  var form = layui.form, jq = layui.jquery;
+  //监听提交
+  form.on('submit(cate_add)', function() {
+  	jq('#cancel').click();
+  });
+  
+  jq('#cancel').click(function(){
+  	var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+	parent.layer.close(index); //再执行关闭 
+  });
+});
+
+</script>

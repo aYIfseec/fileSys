@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="service.BaseUserMapper">
+  <resultMap id="BaseResultMap" type="entity.BaseUser">
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="phone_num" jdbcType="VARCHAR" property="phoneNum" />
+    <result column="login_name" jdbcType="VARCHAR" property="loginName" />
+    <result column="login_pwd" jdbcType="VARCHAR" property="loginPwd" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="work_place" jdbcType="VARCHAR" property="workPlace" />
+    <result column="check_privilege" jdbcType="SMALLINT" property="checkPrivilege" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    user_id, phone_num, login_name, login_pwd, area, real_name, work_place, check_privilege
+  </sql>
+  
+  <select id="searchUserByUserVo" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from t_user where 1 = 1
+    <if test="param2 != null and param2.userId != null and param2.userId != '' ">
+    	and user_id = #{param2.userId}
+    </if>
+    <if test="param2 != null and param2.loginName != null and param2.loginName != '' ">
+    	and login_name = #{param2.loginName}
+    </if>
+    <if test="param2 != null and param2.loginPwd != null and param2.loginPwd != '' ">
+    	and login_pwd = #{param2.loginPwd}
+    </if>
+    <if test="param2 != null and param2.realName != null and param2.realName != '' ">
+    	and real_name = #{param2.realName}
+    </if>
+    <if test="param2 != null and param2.workPlace != null and param2.workPlace != '' ">
+    	and work_place = #{param2.workPlace}
+    </if>
+    <if test="param2 != null and param2.checkPrivilege != null ">
+    	and check_privilege = #{param2.checkPrivilege}
+    </if>
+    
+    <if test="param2 != null and param2.searchKey != null and param2.searchKey != '' ">
+    	and(
+    		login_name like CONCAT ('%',#{param2.searchKey},'%')
+	        or real_name like CONCAT ('%',#{param2.searchKey},'%') 
+	        or work_place like CONCAT ('%',#{param2.searchKey},'%')
+	        or phone_num like CONCAT ('%',#{param2.searchKey},'%')
+	    )
+    </if>
+    
+    <if test="param1 != null">
+    	limit #{param1.start}, #{param1.pageSize}
+    </if>
+  </select>
+  
+  <select id="getSearchCountByUserVo" resultType="java.lang.Integer">
+  	select count(user_id)
+    from t_user where 1 = 1
+    <if test="userId != null and userId != '' ">
+    	and user_id = #{userId}
+    </if>
+    <if test="loginName != null and loginName != '' ">
+    	and login_name = #{loginName}
+    </if>
+    <if test="loginPwd != null and loginPwd != '' ">
+    	and login_pwd = #{loginPwd}
+    </if>
+    <if test="realName != null and realName != '' ">
+    	and real_name = #{realName}
+    </if>
+    <if test="workPlace != null and workPlace != '' ">
+    	and work_place = #{workPlace}
+    </if>
+    <if test="checkPrivilege != null and checkPrivilege != null ">
+    	and check_privilege = #{checkPrivilege}
+    </if>
+    
+    <if test="searchKey != null and searchKey != '' ">
+    	and(
+    		login_name like CONCAT ('%',#{searchKey},'%')
+	        or real_name like CONCAT ('%',#{searchKey},'%') 
+	        or work_place like CONCAT ('%',#{searchKey},'%')
+	        or phone_num like CONCAT ('%',#{searchKey},'%')
+	    )
+    </if>
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_user
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_user
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="entity.BaseUser">
+    insert into t_user (user_id, phone_num, login_name, 
+      login_pwd, area, real_name, 
+      work_place, check_privilege)
+    values (#{userId,jdbcType=VARCHAR}, #{phoneNum,jdbcType=VARCHAR}, #{loginName,jdbcType=VARCHAR}, 
+      #{loginPwd,jdbcType=VARCHAR}, #{area,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, 
+      #{workPlace,jdbcType=VARCHAR}, #{checkPrivilege,jdbcType=SMALLINT})
+  </insert>
+  <insert id="insertSelective" parameterType="entity.BaseUser">
+    insert into t_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="phoneNum != null">
+        phone_num,
+      </if>
+      <if test="loginName != null">
+        login_name,
+      </if>
+      <if test="loginPwd != null">
+        login_pwd,
+      </if>
+      <if test="area != null">
+        area,
+      </if>
+      <if test="realName != null">
+        real_name,
+      </if>
+      <if test="workPlace != null">
+        work_place,
+      </if>
+      <if test="checkPrivilege != null">
+        check_privilege,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNum != null">
+        #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="loginName != null">
+        #{loginName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPwd != null">
+        #{loginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+        #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="workPlace != null">
+        #{workPlace,jdbcType=VARCHAR},
+      </if>
+      <if test="checkPrivilege != null">
+        #{checkPrivilege,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="entity.BaseUser">
+    update t_user
+    <set>
+      <if test="phoneNum != null">
+        phone_num = #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="loginName != null">
+        login_name = #{loginName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPwd != null">
+        login_pwd = #{loginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        area = #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+        real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="workPlace != null">
+        work_place = #{workPlace,jdbcType=VARCHAR},
+      </if>
+      <if test="checkPrivilege != null">
+        check_privilege = #{checkPrivilege,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="entity.BaseUser">
+    update t_user
+    set phone_num = #{phoneNum,jdbcType=VARCHAR},
+      login_name = #{loginName,jdbcType=VARCHAR},
+      login_pwd = #{loginPwd,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      work_place = #{workPlace,jdbcType=VARCHAR},
+      check_privilege = #{checkPrivilege,jdbcType=SMALLINT}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+</mapper>

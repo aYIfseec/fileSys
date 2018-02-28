@@ -1,0 +1,26 @@
+<html>
+<head>
+</head>
+<body>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="${s.base}/res/layui/layui.js" type="text/javascript"></script>
+<script type="text/javascript">
+layui.use('layer', function(){
+	loading = layer.load(1, {
+        shade: [0.9,'#000']
+    });
+    $.ajax({
+		type: 'POST',
+		url: '${s.base}/file/getPdf.html?path=${file.path}',
+		data: null,
+		dataType: 'text',
+        success: function(returnMsg){
+        	//layer.close(loading);
+        	window.location.href = '${s.base}/res/pdfjs-dist/web/viewer.html?file=${s.base}/'+returnMsg;
+		}
+    });
+});
+//window.location.href = '${s.base}/pdfFile/1504611909084.pdf';
+</script>
+</body>
+</html>

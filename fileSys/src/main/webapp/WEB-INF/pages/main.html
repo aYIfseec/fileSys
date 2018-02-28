@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>文件上传下载系统</title>
+	<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css">
+</head>
+
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<div class="layui-header">
+			<div class="layui-logo">文件上传下载系统</div>
+			<!-- 头部区域（可配合layui已有的水平导航） -->
+			<ul class="layui-nav layui-layout-right">
+				<li class="layui-nav-item">
+					<a href="javascript:modifyPwd()">
+						${loginName!}
+					</a>
+				</li>
+				<li class="layui-nav-item"><a href="${s.base}/login.html">退了</a></li>
+			</ul>
+		</div>
+	  
+		<div class="layui-side layui-bg-black">
+			<div class="layui-side-scroll">
+				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+				<ul class="layui-nav layui-nav-tree">
+					<li class="layui-nav-item"><a href="${s.base}/fileList.html" target="right">文件管理</a></li>
+					<li class="layui-nav-item"><a href="${s.base}/uploadedFile.html" target="right">我的文件</a></li>	
+					<#if (loginName!"unknown") == "admin">
+						<li class="layui-nav-item"><a href="${s.base}/userList.html" target="right">用户管理</a></li>
+						<li class="layui-nav-item"><a href="${s.base}/areaEdit.html" target="right">区域管理</a></li>
+					</#if>
+					<li class="layui-nav-item"><a href="${s.base}/statistic.html" target="right">数据统计</a></li>						
+				</ul>
+			</div>
+		</div>
+	  
+		<div class="layui-body" style="overflow:-Scroll;overflow-y:hidden">
+			<!-- 内容主体区域 -->
+			<iframe id="content" src="${s.base}/fileList.html" style="height:100%; width:100%" name="right"></iframe>
+		</div>
+	  
+		<div class="layui-footer">
+			<!-- 底部固定区域 -->
+			© by kpp
+		</div>
+	</div>
+	
+	<script src="${s.base}/res/layui/layui.js"></script>
+	<script>
+	//JavaScript代码区域
+	layui.use('element', function(){
+	  var element = layui.element;	  
+	});
+	
+	function modifyPwd(){
+		layui.use('layer', function(){
+			layer.open({
+				title :'修改密码',
+				area: ['250px', '300px'],
+				type: 2,
+				scrollbar: false,
+				content: '${s.base}/modifySelfPwdLayer.html' //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+			});
+		});
+	}
+	</script>
+	
+</body>
+</html>
+      

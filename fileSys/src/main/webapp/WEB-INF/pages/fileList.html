@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+  <link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+  <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+
+<body>             
+	<div class="position">
+		<div class="ml15">
+			文件管理
+		</div>
+	</div>
+	
+	<div class="box">
+		<div class="layui-tab layui-tab-brief" lay-filter="tab-index">
+  			<ul class="layui-tab-title">
+		    	<li class="layui-this" lay-id="1">党建工作文件资源库</li>
+		    	<li lay-id="2">党建工作相关材料资源库</li>
+		    	
+		    	<#if (check?int) == 1>
+		    	<li lay-id="3">文件资源<font color="red">（待审核）</font></li>
+		    	<li lay-id="4">相关材料<font color="red">（待审核）</font></li>
+		    	</#if>		    	
+		  	</ul>
+		  	
+		  	<div class="layui-tab-content">		  	
+		    	<div class="layui-tab-item layui-show">
+		    		<div class="content-first">
+						<button class="layui-btn" onclick="javascript:showPop(1)" style="display:block">
+							<i class="layui-icon">&#xe608;</i> 添加文件
+						</button>
+						
+						<form class="layui-form mt15">
+
+							<div class="layui-form-item">
+								<label class="layui-form-label">区域选择</label>
+								<div class="layui-input-inline">
+									<select name="selectCity" lay-filter="selectCity1" id="selectCity1">
+										<option value="${area.areaCode!}" selected>${area.areaName!}</option>
+										<#list cityAreaList as a>
+										<option value="${a.areaCode!}">${a.areaName!}</option>
+										</#list>
+									</select>
+								</div>
+								<div class="layui-input-inline" lay-filter="selectDiv">
+									<select name="selectTown" id="selectTown1"
+										lay-filter="selectTown">
+										<option value="">请选择乡镇</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<label class="layui-form-label">文件级别</label>
+								<div class="layui-input-inline ">
+									<select name="file-level" id="file-level" style="width:200px ">
+								  		<option value="">--请选择文件级别--</option>
+								  		<#list fileLevelList as f>
+								  			<option value="${f.code}">${f.detail}</option>	
+								  		</#list>
+									</select>
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<input name="first-searchKey" id="first-searchKey" autocomplete="off" class="layui-input " style="width:200px " placeholder="请输入关键字搜索">
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<a class="layui-btn ml15" href="javascript:firstQueryPage(1)">
+										<i class="layui-icon" >&#xe615;</i> 搜索文件
+									</a>
+								</div>
+							</div>
+						</form>
+						
+						<table class="layui-table mt15" lay-size="sm" id="first-table">
+							<colgroup>
+								<col>
+								<col width="13%">
+								<col width="15%">
+								<col width="15%">
+								<col width="13%">
+								<col width="13%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>文件名称</th>
+									<th>文件级别</th>
+									<th>上传时间</th>
+									<th>所属地区</th>
+									<th>上传人</th>
+									<th>操作</th>
+								</tr> 
+							</thead>
+							<tbody>
+								<#list page.items as f>
+									<tr>
+										<td>${f.fileName!}</td>
+										<td>${f.fileTypeName!}</td>
+										<td>${f.uploadTime?datetime!} </td>
+										<td>${f.areaName!} </td>
+										<td>${f.fileOwnerRealName!}</td>
+										<td><a href="${s.base}/file/previewFile.html?path=${f.path}" target="_Blank">预览</a> <span>| </span>
+											<a href="javascript:download('${f.path}','${f.fileName}')">下载</a> <span>| </span> 
+											<a href="javascript:delFile('${f.fileId}', 1);">删除</a></td>						
+									</tr>
+								</#list>
+							</tbody>
+						</table>
+					
+						<div id="first-page"></div>
+					</div>
+		    	</div>
+		    	
+		    	<div class="layui-tab-item">
+		    		<div class="content-second">
+						<button class="layui-btn" onclick="javascript:showPop(0)" style="display:block">
+							<i class="layui-icon">&#xe608;</i> 添加文件
+						</button>
+						
+						<form class="layui-form mt15">
+							
+							<div class="layui-form-item">
+								<label class="layui-form-label">区域选择</label>
+								<div class="layui-input-inline">
+									<select name="selectCity" lay-filter="selectCity2" id="selectCity2">
+										<option value="${area.areaCode!}" selected>${area.areaName!}</option>
+										<#list cityAreaList as a>
+										<option value="${a.areaCode!}">${a.areaName!}</option>
+										</#list>
+									</select>
+								</div>
+								<div class="layui-input-inline" lay-filter="selectDiv">
+									<select name="selectTown" id="selectTown2"
+										lay-filter="selectTown">
+										<option value="">请选择乡镇</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="layui-form-item">
+								<label class="layui-form-label">文件类型</label>
+								<div class="layui-input-inline ">
+									<select name="work-class"  id="work-class" style="width:200px ">
+								  		<option value="">--请选择工作类型--</option>
+								  		<#list workClassList as w>
+								  			<option value="${w.code}">${w.detail}</option>
+								  		</#list>
+									</select>
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<input name="second-searchKey" id="second-searchKey" autocomplete="off" class="layui-input " style="width:200px " placeholder="请输入关键字搜索">
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<a class="layui-btn ml15" href="javascript:secondQueryPage(1)">
+										<i class="layui-icon" >&#xe615;</i> 搜索文件
+									</a>
+								</div>
+							</div>
+						</form>
+						
+						<table class="layui-table mt15" lay-size="sm" id="second-table">
+							<colgroup>
+								<col>
+								<col width="13%">
+								<col width="15%">
+								<col width="15%">
+								<col width="13%">
+								<col width="13%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>文件名称</th>
+									<th>文件级别</th>
+									<th>上传时间</th>
+									<th>所属地区</th>
+									<th>上传人</th>
+									<th>操作</th>
+								</tr> 
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+					
+						<div id="second-page"></div>
+					</div>
+		    	</div>
+		    	
+		    	<#if (check?int) == 1>   <!-- if start -->
+		    	
+		    	<div class="layui-tab-item">
+		    		<div class="content-third">
+						<form class="layui-form mt15">
+							<div class="layui-form-item">
+								<div class="layui-input-inline ">
+									<select name="file-level-wait" id="file-level-wait" style="width:200px ">
+								  		<option value="">--请选择文件级别--</option>
+								  		<#list fileLevelList as f>
+								  			<option value="${f.code}">${f.detail}</option>	
+								  		</#list>
+									</select>
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<input name="third-searchKey" id="third-searchKey" autocomplete="off" class="layui-input " style="width:200px " placeholder="请输入关键字搜索">
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<a class="layui-btn ml15" href="javascript:thirdQueryPage(1)">
+										<i class="layui-icon" >&#xe615;</i> 搜索文件
+									</a>
+								</div>
+							</div>
+						</form>
+						
+						<table class="layui-table mt15" lay-size="sm" id="third-table">
+							<colgroup>
+								<col>
+								<col width="13%">
+								<col width="15%">
+								<col width="15%">
+								<col width="13%">
+								<col width="13%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>文件名称</th>
+									<th>文件级别</th>
+									<th>上传时间</th>
+									<th>所属地区</th>
+									<th>上传人</th>
+									<th>操作</th>
+								</tr> 
+							</thead>
+							<tbody>
+								
+							</tbody>
+						</table>
+					
+						<div id="third-page"></div>
+					</div>
+		    	</div>
+		    	
+		    	<div class="layui-tab-item">
+		    		<div class="content-fourth">						
+						<form class="layui-form mt15">
+							<div class="layui-form-item">
+								<div class="layui-input-inline ">
+									<select name="work-class-wait" id="work-class-wait" style="width:200px ">
+								  		<option value="">--请选择工作类型--</option>
+								  		<#list workClassList as w>
+								  			<option value="${w.code}">${w.detail}</option>
+								  		</#list>
+									</select>
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<input name="fourth-searchKey" id="fourth-searchKey" autocomplete="off" class="layui-input " style="width:200px " placeholder="请输入关键字搜索">
+								</div>
+								
+								<div class="layui-input-inline ml15">
+									<a class="layui-btn ml15" href="javascript:fourthQueryPage(1);">
+										<i class="layui-icon" >&#xe615;</i> 搜索文件
+									</a>
+								</div>
+							</div>
+						</form>
+						
+						<table class="layui-table mt15" lay-size="sm" id="fourth-table">
+							<colgroup>
+								<col>
+								<col width="13%">
+								<col width="15%">
+								<col width="15%">
+								<col width="13%">
+								<col width="13%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>文件名称</th>
+									<th>文件级别</th>
+									<th>上传时间</th>
+									<th>所属地区</th>
+									<th>上传人</th>
+									<th>操作</th>
+								</tr> 
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					
+						<div id="fourth-page"></div>
+					</div>
+		    	</div>
+		    	
+		    	</#if>	<!-- if end -->
+		    	
+		    		    	
+		  	</div>
+		</div>
+	</div>
+          
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="${s.base}/res/handlebars-v4.0.10.js"></script>
+
+<script id="first-list-template" type="text/x-handlebars-template">
+  	{{#each items}}
+      <tr>
+		<td>{{fileName}}</td>
+        <td>{{fileTypeName}}</td>
+        <td>{{timeFormat}}</td>
+		<td>{{areaName}}</td>
+        <td>{{fileOwnerRealName}}</td>
+		<td><a href="${s.base}/file/previewFile.html?path={{path}}" target="_Blank">预览</a> <span>| </span>
+			<a href="javascript:download('{{path}}','{{fileName}}')">下载</a> <span>| </span> 
+			<a href="javascript:delFile('{fileId}}', 1);">删除</a>
+		</td>		
+      </tr>
+    {{/each}}
+</script>
+<script id="second-list-template" type="text/x-handlebars-template">
+  	{{#each items}}   								
+		<tr>
+			<td>{{fileName}}</td>
+			<td>{{fileTypeName}}</td>
+			<td>{{timeFormat}} </td>
+			<td>{{areaName}}</td>
+			<td>{{fileOwnerRealName}}</td>
+			<td><a href="${s.base}/file/previewFile.html?path={{path}}" target="_Blank">预览</a> <span>| </span>
+				<a href="javascript:download('{{path}}','{{fileName}}')">下载</a> <span>| </span> 
+				<a href="javascript:delFile('{{fileId}}', 2);">删除</a></td>						
+			</tr>
+    {{/each}}
+</script>
+<script id="third-list-template" type="text/x-handlebars-template">
+  	{{#each items}}
+      <tr>
+		<td>{{fileName}}</td>
+        <td>{{fileTypeName}}</td>
+        <td>{{timeFormat}}</td>
+		<td>{{areaName}}</td>
+        <td>{{fileOwnerRealName}}</td>
+		<td><a href="${s.base}/file/previewFile.html?path={{path}}" target="_Blank">预览</a> <span>| </span>
+			<a href="javascript:download('{{path}}','{{fileName}}')">下载</a> <span>| </span>
+			<a href="javascript:updateFileState('{{fileId}}', 1, 3);">通过</a> <span>| </span>
+			<a href="javascript:updateFileState('{{fileId}}', -1, 3);">拒绝</a>
+		</td>
+      </tr>
+    {{/each}}
+</script>
+<script id="fourth-list-template" type="text/x-handlebars-template">
+  	{{#each items}}
+      <tr>
+		<td>{{fileName}}</td>
+        <td>{{fileTypeName}}</td>
+        <td>{{timeFormat}}</td>
+		<td>{{areaName}}</td>
+        <td>{{fileOwnerRealName}}</td>
+		<td><a href="${s.base}/file/previewFile.html?path={{path}}" target="_Blank">预览</a> <span>| </span>
+			<a href="javascript:download('{{path}}','{{fileName}}')">下载</a> <span>| </span>
+			<a href="javascript:updateFileState('{{fileId}}', 1, 4);">通过</a> <span>| </span>
+			<a href="javascript:updateFileState('{{fileId}}', -1, 4);">拒绝</a>
+		</td>				
+      </tr>
+    {{/each}}
+</script>
+
+<script>
+layui.use('element', function(){
+	//选项卡依赖element
+	  var element = layui.element;
+	
+	//监听Tab切换，以改变地址hash值
+	  element.on('tab(tab-index)', function(){
+		  tabChange( this.getAttribute('lay-id') );
+	  });
+});
+	
+layui.use('form', function(){
+	  var form = layui.form;
+	  form.on('select(selectCity1)', function(data){
+		  	$("#selectTown1").empty();
+		  	var htmlStr = '<option value="">请选择乡镇</option>';
+		  	if (data.value == "0000") {
+		  		$("#selectTown1").append(htmlStr);
+		  		form.render('select');
+				return;
+			}
+			$.ajax({
+				type : "POST",
+				url : '${s.base}/area/getAreaByParentCode.html',
+				data: {"parentCode": data.value },
+				dataType: 'json', 
+				success: function(data) {
+					if (data == null || data == "[]") {
+						layer.msg("无乡镇信息！",{time: 1000,offset: ['50px', '60px']});
+					} else {
+						for (var i = 0; i < data.length; i++) {
+               				htmlStr += '<option value="' + data[i].areaCode + '">' + data[i].areaName + '</option>';
+           				}
+           			}
+           			$("#selectTown1").append(htmlStr);
+           			form.render('select');
+				},error:function(){
+			        	layer.msg("未响应！", {time: 1000,offset: ['50px', '60px']});  
+				}
+			});
+	});
+	
+	form.on('select(selectCity2)', function(data){
+		  	$("#selectTown2").empty();
+		  	var htmlStr = '<option value="">请选择乡镇</option>';
+		  	if (data.value == "0000") {
+		  		$("#selectTown2").append(htmlStr);
+		  		form.render('select');
+				return;
+			}
+			$.ajax({
+				type : "POST",
+				url : '${s.base}/area/getAreaByParentCode.html',
+				data: {"parentCode": data.value },
+				dataType: 'json', 
+				success: function(data) {
+					if (data == null || data == "[]") {
+						layer.msg("无乡镇信息！",{time: 1000,offset: ['50px', '60px']});
+					} else {
+						for (var i = 0; i < data.length; i++) {
+               				htmlStr += '<option value="' + data[i].areaCode + '">' + data[i].areaName + '</option>';
+           				}
+           			}
+           			$("#selectTown2").append(htmlStr);
+           			form.render('select');
+				},error:function(){
+			        	layer.msg("未响应！", {time: 1000,offset: ['50px', '60px']});  
+				}
+			});
+	});
+});
+
+layui.use('laypage', function(){
+  var laypage = layui.laypage;
+  
+  //执行一个laypage实例
+  laypage.render({
+    elem: 'first-page'
+    ,count: ${page.totalItemsCount} //数据总数 //从服务端得到
+    ,limit: ${page.pageSize}
+    ,curr: ${page.pageNum}
+    ,jump: function(data, first){
+    	if(!first){
+    		firstQueryPage(data.curr);
+    	}
+    }
+  });
+});
+
+function firstQueryPage(pageNumValue){
+	var areaCode = $('#selectTown1').val();
+	if (areaCode == null || areaCode == "") {
+		areaCode = $('#selectCity1').val();
+		if (areaCode == "0000") {
+			areaCode = "";
+		}
+	}
+	$.post('${s.base}/file/getFileByCondition.html', 
+			{
+				state : 1,
+				fileClass : 1,
+				fileType : $('#file-level').val(),
+				searchKey : $('#first-searchKey').val(),
+				areaName : areaCode,
+				pageNum : pageNumValue
+			},
+			function(page){
+				$("#first-table  tr:not(:first)").empty("");  //清空表格
+				var text=$("#first-list-template").html();
+			    var myTemplate = Handlebars.compile(text);
+				
+		        var html=myTemplate(page);
+		        $("#first-table").append(html);  //给表格添加内容
+		        //重绘分页控件
+		        layui.use('laypage', function(){
+		        	  var laypage = layui.laypage;
+		        	  
+		        	  //执行一个laypage实例
+		        	  laypage.render({
+		        	    elem: 'first-page'
+		        	    ,count: page.totalItemsCount //数据总数 //从服务端得到
+		        	    ,limit: page.pageSize
+		        	    ,curr: page.pageNum
+		        	    ,jump: function(data, first){
+		        	    	if(!first){
+		        	    		firstQueryPage(data.curr);
+		        	    	}
+		        	    }
+		        	  });
+		        	});
+			},
+			'json'
+	);
+}
+
+function secondQueryPage(pageNumValue){
+	var areaCode = $('#selectTown2').val();
+	if (areaCode == null || areaCode == "") {
+		areaCode = $('#selectCity2').val();
+		if (areaCode == "0000") {
+			areaCode = "";
+		}
+	}
+	$.post('${s.base}/file/getFileByCondition.html', 
+			{
+				state : 1,
+				fileClass : 0,
+				fileType : $('#work-class').val(),
+				searchKey : $('#second-searchKey').val(),
+				areaName : areaCode,
+				pageNum : pageNumValue
+			},
+			function(page){
+				$("#second-table  tr:not(:first)").empty("");  //清空表格
+				var text=$("#second-list-template").html();
+			    var myTemplate = Handlebars.compile(text);
+				
+		        var html=myTemplate(page);
+		        $("#second-table").append(html);  //给表格添加内容
+		        
+		        //重绘分页控件
+		        layui.use('laypage', function(){
+		        	  var laypage = layui.laypage;
+		        	  
+		        	  //执行一个laypage实例
+		        	  laypage.render({
+		        	    elem: 'second-page'
+		        	    ,count: page.totalItemsCount //数据总数 //从服务端得到
+		        	    ,limit: page.pageSize
+		        	    ,curr: page.pageNum
+		        	    ,jump: function(data, first){
+		        	    	if(!first){
+		        	    		secondQueryPage(data.curr);
+		        	    	}
+		        	    }
+		        	  });
+		        	});
+			},
+			'json'
+	);
+}
+
+function thirdQueryPage(pageNumValue){
+	var areaCode = $('#selectTown3').val();
+	if (areaCode == null || areaCode == "") {
+		areaCode = $('#selectCity3').val();
+		if (areaCode == "0000") {
+			areaCode = "";
+		}
+	}
+	$.post('${s.base}/file/getFileByCondition.html', 
+			{
+				state : 0,
+				fileClass : 1,
+				fileType : $('#file-level-wait').val(),
+				searchKey : $('#third-searchKey').val(),
+				areaName : areaCode,
+				pageNum : pageNumValue
+			},
+			function(page){
+				$("#third-table  tr:not(:first)").empty("");  //清空表格
+				var text = $("#third-list-template").html();
+			    var myTemplate = Handlebars.compile(text);
+		        var html = myTemplate(page);
+		        $("#third-table").append(html);  //给表格添加内容
+		        //重绘分页控件
+		        layui.use('laypage', function(){
+		        	  var laypage = layui.laypage;
+		        	  
+		        	  //执行一个laypage实例
+		        	  laypage.render({
+		        	    elem: 'third-page'
+		        	    ,count: page.totalItemsCount //数据总数 //从服务端得到
+		        	    ,limit: page.pageSize
+		        	    ,curr: page.pageNum
+		        	    ,jump: function(data, first){
+		        	    	if(!first){
+	        	    			thirdQueryPage(data.curr);
+		        	    	}
+		        	    }
+		        	  });
+		        	});
+			},
+			'json'
+	);
+}
+
+function fourthQueryPage(pageNumValue){
+	var areaCode = $('#selectTown4').val();
+	if (areaCode == null || areaCode == "") {
+		areaCode = $('#selectCity4').val();
+		if (areaCode == "0000") {
+			areaCode = "";
+		}
+	}
+	$.post('${s.base}/file/getFileByCondition.html', 
+			{
+				state : 0,
+				fileClass : 0,
+				fileType : $('#work-class-wait').val(),
+				searchKey : $('#fourth-searchKey').val(),
+				areaName : areaCode,
+				pageNum : pageNumValue
+			},
+			function(page){
+				$("#fourth-table  tr:not(:first)").empty("");  //清空表格
+				var text=$("#fourth-list-template").html();
+			    var myTemplate = Handlebars.compile(text);
+				
+		        var html=myTemplate(page);
+		        $("#fourth-table").append(html);  //给表格添加内容
+		        
+		        //重绘分页控件
+		        layui.use('laypage', function(){
+		        	  var laypage = layui.laypage;
+		        	  
+		        	  //执行一个laypage实例
+		        	  laypage.render({
+		        	    elem: 'fourth-page'
+		        	    ,count: page.totalItemsCount //数据总数 //从服务端得到
+		        	    ,limit: page.pageSize
+		        	    ,curr: page.pageNum
+		        	    ,jump: function(data, first){
+		        	    	if(!first){
+		        	    		fourthQueryPage(data.curr);
+		        	    	}
+		        	    }
+		        	  });
+		        	});
+			},
+			'json'
+	);
+}
+
+function showPop(category){
+	layui.use('layer', function(){
+		layer.open({
+			title :'文件上传',
+			area: ['250px', '300px'],
+			type: 2,
+			scrollbar: false,
+			content: '${s.base}/file/addFileLayer.html?type='+category
+		});
+	});
+}
+
+function download(path, fileName) {
+	fileName = encodeURI(fileName);
+	fileName = encodeURI(fileName);//两次编码
+	layui.use('layer', function(){
+		layer.open({
+			title :'文件下载',
+			area: ['330px', '260px'],
+			type: 2,
+			scrollbar: false,
+			content: '${s.base}/file/downloadLayer.html?fileName='
+			 + fileName + '&path=' + path
+		});
+	});
+}
+
+function delFile(id, tab){
+	$.post('${s.base}/file/deleteFile.html',
+			{fileId : id},
+			function(data) {
+				if(data == "true"){
+					layui.use('layer', function(){
+						var layer = layui.layer;
+						layer.msg('删除成功', {icon: 1, time: 2000}, function(){
+							if (tab == 1) {
+								firstQueryPage(1);
+							} else {
+								secondQueryPage(1);
+							}//刷新
+						});
+					});
+				} else if (data == "false"){
+					layui.use('layer', function(){
+						var layer = layui.layer;
+						layer.msg('删除失败',{icon: 2, time: 2000});
+					});
+				} else {
+					layui.use('layer', function(){
+						var layer = layui.layer;
+						layer.msg('您没有删除此文件的权限！',{icon: 2, time: 2000});
+					});
+				}
+			}
+	);
+}
+
+function updateFileState(id, fileState, tab) {
+	$.post('${s.base}/file/updateFile.html',
+			{fileId : id, state : fileState},
+			function(data) {
+				if(data == "true"){
+					layui.use('layer', function(){
+						var layer = layui.layer;
+						layer.msg('操作成功', {icon: 1, time: 1000}, function(){
+							if (tab == 3) {
+								thirdQueryPage(1);
+							} else {
+								fourthQueryPage(1);
+							}//刷新
+						});
+					});
+				}else{
+					layui.use('layer', function(){
+						var layer = layui.layer;
+						layer.msg('操作失败',{icon: 2, time: 1000});
+					});
+				}
+			}
+	);
+}
+
+function tabChange(index){
+	switch (index){
+		case '1':{  //已通过的工作文件资源库
+			firstQueryPage(1);
+		}
+		break;
+		case '2':{	//已通过的工作相关资料
+			secondQueryPage(1);
+		}
+		break;
+		case '3':{  //未通过的工作文件资源库
+			thirdQueryPage(1);
+		}
+		break;
+		case '4':{  //未通过的工作工作相关资料
+			fourthQueryPage(1);
+		}
+		break;
+	}
+}
+
+</script>
+
+</body>
+</html>

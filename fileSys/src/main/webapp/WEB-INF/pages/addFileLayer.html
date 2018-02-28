@@ -1,0 +1,109 @@
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+<link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+
+<div class="ml15 mt15">
+	<form class="layui-form" id="fileForm" method="post" ENCTYPE="multipart/form-data">
+		<div class="layui-input-inline">
+		<div class="layui-form-item">
+			<#if category == 1> <!-- 服务端传category字段来 1表示工作文件 其他表示资料 -->
+				<select id="fileType" style="width:200px ">
+			  		<option value="">--请选择级别类型--</option>
+			  		<#list fileLevelList as f>
+			  			<option value="${f.code!}">${f.detail!}</option>
+			  		</#list>
+				</select>
+			<#else>
+				<select id="fileType" style="width:200px ">
+					<option value="">--请选择工作类型--</option>
+					<#list workClassList as w>
+			  			<option value="${w.code!}">${w.detail!}</option>
+			  		</#list>
+				</select>
+			</#if>
+			
+			<input type="text" name="uploadFileText" id="uploadFileText" disabled 
+				placeholder="上传文件路径" autocomplete="off" class="layui-input mt15" value="">
+			<a href="javascript:scanFile()" id="uploadFileButton" class="layui-btn mt15">选择文件路径</a>
+			<input id="file" name="file" type="file" style="display:none" onchange="changeFile()">
+		</div>
+		</div>
+	</form>
+
+	<div class ="">
+		<a href="javascript:uploadFile()" class="layui-btn">上传</a>
+	</div>
+</div>
+
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery.form.js" charset="utf-8"></script>
+
+<script charset="utf-8">
+	layui.use('form', function(){
+		  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+	});
+
+	function scanFile(){
+		$('#file').click();
+	}
+	
+	function changeFile(){
+		var filePath = $('#file').val();
+		var fileName = filePath.substr(filePath.lastIndexOf('\\')+1);  
+		$('#uploadFileText').val(fileName);
+	}
+	
+	function uploadFile(){
+		if($('#uploadFileText') == null || $('#uploadFileText').val().trim() == ''){
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('请选择要上传的文件');
+			});  
+			return;
+		}	
+		
+		var type = $('#fileType').val();
+		if (type == null || type == '') {
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('请选择类型');
+			});  
+			return;
+		}
+		var options  = {
+			url:'${s.base}/file/uploadFile.html?' + 
+				'fileClass=${category}&fileType=' + type,
+			data:null,
+		    type:'post',
+		    success:function(data){
+		    	if(data == "true") {
+		    		layui.use('layer', function(){
+						var layer = parent.layer;
+						layer.msg('上传成功', {icon: 1, time: 2000}, function(){
+							parent.layer.closeAll();
+						});
+					});
+				} else {
+					layui.use('layer', function(){
+						var layer = parent.layer;
+						layer.msg('上传失败', {icon: 2, time: 2000});
+					});
+				}
+		    },
+			error:function(){
+				layui.use('layer', function(){
+					var layer = parent.layer;
+					layer.msg('上传失败',{icon: 2, time: 2000});
+				});
+			},
+			complete:function(){
+			}
+		};
+		
+		var form = $("form[id='fileForm']");
+		form.ajaxSubmit(options);
+		
+		//var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+		//parent.layer.close(index); //再执行关闭 
+	}	
+</script>

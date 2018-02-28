@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+  <link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+  <link rel="stylesheet" href="${s.base}/res/css/scrollbar.css">
+  
+</head>
+
+<body>             
+	<div class="position">
+		<div class="ml15">
+			区域管理
+		</div>
+	</div>	
+	
+	<div class="box" style="height:500px;"><!--  style="height:100%;" -->
+		<iframe name="tree" src="${s.base}/area/cityTree.html" frameborder="no" style="width:80%;height:90%;"></iframe>
+		<table class="layui-table">
+		</table>
+	</div>
+	
+          
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+
+<script>
+layui.use('layer', function(){
+	var layer = layui.layer;
+});
+</script>
+
+</body>
+</html>

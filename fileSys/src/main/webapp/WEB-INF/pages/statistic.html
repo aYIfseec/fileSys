@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+  <link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+</head>
+
+<body>             
+	<div class="position">
+		<div class="ml15">
+			数据统计
+		</div>
+	</div>	
+	
+	<div class="box">
+		<form class="layui-form" id="countForm">
+		
+			<div class="layui-form-item">
+		    	<label class="layui-form-label"><font color="red">*</font>区域选择</label>
+		    	<div class="layui-input-inline">
+			      	<select name="selectCity" lay-filter="selectCity">
+			        	<option value="${area.areaCode!}" selected>${area.areaName!}</option>
+			        	<#list cityAreaList as a>
+			        		<option value="${a.areaCode!}">${a.areaName!}</option>
+			        	</#list>
+			      	</select>
+		    	</div>
+			    <div class="layui-input-inline" lay-filter="selectDiv">
+			      	<select name="selectTown" id="selectTown" lay-filter="selectTown">
+			        	<option value="">请选择乡镇</option>
+			      	</select>
+			    </div>
+		  	</div>
+		  	
+		  	<div class="layui-form-item">
+		  		<div class="layui-input-inline" style="width:420px">
+		  		<label class="layui-form-label">文件类型</label>			    
+				    <div class="layui-input-block"  >
+				    	<input type="radio" lay-filter="file-filter" name="fileClass" value="" title="所有" checked>
+				      	<input type="radio" lay-filter="file-filter" name="fileClass" value="1" title="工作文件" >
+				      	<input type="radio" lay-filter="file-filter" name="fileClass" value="0" title="相关资料">			      	
+				    </div>
+			    </div>
+			    
+			    <div class="layui-input-inline ">
+					<select name="fileClassDetail" id="file-class-list" style="width:200px ">
+				  		<option value="">--所有--</option>
+					</select>
+				</div>
+  			</div>
+  			
+  			<div class="layui-form-item">
+		  		<div class="layui-input-inline" style="width:320px">
+		  		<label class="layui-form-label">操作类型</label>			    
+				    <div class="layui-input-block">
+				    	<input type="radio" lay-filter="operate-filter" name="operateType" value="1" title="上传" checked>
+				      	<input type="radio" lay-filter="operate-filter" name="operateType" value="2" title="下载" >	      	
+				    </div>
+			    </div>			   
+  			</div> 		
+  			
+  			<div class="layui-form-item">
+      			<a class="layui-btn" style="margin-left:40px" href="javascript:search();">统计</a>
+      		</div>
+      		
+      	</form>
+      		
+  		<table class="layui-table mt15" id="show-table" lay-size="sm">
+			<colgroup>
+				<col width="20%">
+				<col width="40%">
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>区域名称</th>
+					<th>文件数量</th>
+				</tr> 
+			</thead>
+		</table>
+     					
+		
+	</div>
+          
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="${s.base}/res/json2.js"></script>
+<script type="text/javascript" src="${s.base}/res/handlebars-v4.0.10.js"></script>
+<script src="${s.base}/res/jquery.form.js" charset="utf-8"></script>
+
+<script id="list-template" type="text/x-handlebars-template">
+  	{{#each this}}
+      <tr>
+		<td>{{sortId}}</td>
+        <td>{{areaRealName}}</td>
+        <td>{{count}}</td>	
+      </tr>
+    {{/each}}
+</script>
+
+<script>
+
+/*global_operate_type变量表示当前 上传 下载 radio选中的值   1上传(默认) 2下载 */
+var global_operate_type = 1;
+
+layui.use('form', function(){
+	  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+	  
+	  form.on('select(selectCity)', function(data){
+		  	$("#selectTown").empty();
+		  	var htmlStr = '<option value="">请选择乡镇</option>';
+		  	if (data.value == "0000") {
+		  		$("#selectTown").append(htmlStr);
+		  		form.render('select');
+				return;
+			}
+			$.ajax({
+				type : "POST",
+				url : '${s.base}/area/getAreaByParentCode.html',
+				data: {"parentCode": data.value },
+				dataType: 'json', 
+				success: function(data) {
+					if (data == null || data == "[]") {
+						layer.msg("无乡镇信息！",{time: 1000,offset: ['50px', '60px']});
+					} else {
+						for (var i = 0; i < data.length; i++) {
+             				htmlStr += '<option value="' + data[i].areaCode + '">' + data[i].areaName + '</option>';
+         				}
+         			}
+         			$("#selectTown").append(htmlStr);
+         			form.render('select');
+				},error:function(){
+			        	layer.msg("未响应！", {time: 1000,offset: ['50px', '60px']});  
+				}
+			});
+		  });
+	  
+	  form.on('radio(file-filter)', function(data){
+		  var radioValue = data.value;
+		  $("#file-class-list").empty();
+		  var html = '<option value="">--所有--</option>';
+		  
+		  if(radioValue == 5){			  
+			  $("#file-class-list").append(html);
+			  form.render('select');
+		  }else if(radioValue == 1){
+			  $.post('${s.base}/file/getFileClassDict.html',
+					  {descript : '文件级别'},
+					  function(data){
+						  data = JSON.parse(data);
+						  for (var i = 0; i < data.length; i++) {
+							  html += '<option value="' + data[i].code + '">' + data[i].detail + '</option>';
+	           				}
+						  $("#file-class-list").append(html);
+						  form.render('select');
+					  }
+				);
+			  
+		  }else if(radioValue == 0){
+			  //文件工作类型
+			  $.post('${s.base}/file/getFileClassDict.html',
+					  {descript : '文件工作类型'},
+					  function(data){
+						  data = JSON.parse(data);
+						  for (var i = 0; i < data.length; i++) {
+							  html += '<option value="' + data[i].code + '">' + data[i].detail + '</option>';
+	           				}
+						  $("#file-class-list").append(html);
+						  form.render('select');
+					  }
+				);
+		  }
+		});
+	  
+	  form.on('radio(operate-filter)', function(data){
+		  global_operate_type = data.value;
+	  });
+	  
+});
+
+function search(){
+	var visitUrl = '${s.base}/file/getUploadStatisticData.html';
+	if(global_operate_type == 2){
+		visitUrl = '${s.base}/file/getDownloadStatisticData.html';
+	}
+	
+	var options  = {    
+			url: visitUrl,
+			data: null,
+		    type:'post',   
+		    success:function(data){
+		    	$("#show-table  tr:not(:first)").empty("");  //清空表格
+				var text=$("#list-template").html();
+			    var myTemplate = Handlebars.compile(text);				
+		        var html=myTemplate(JSON.parse(data) );
+		        $("#show-table").append(html);  //给表格添加内容
+		    },
+			error:function(){
+				
+			},
+			complete:function(){
+			}
+		};
+		
+		$("form[id='countForm']").ajaxSubmit(options);
+}
+</script>
+
+</body>
+</html>

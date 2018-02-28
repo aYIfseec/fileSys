@@ -1,0 +1,126 @@
+/* 设置滚动条的样式  */
+::-webkit-scrollbar {    width: 5px;}
+滚动槽
+::-webkit-scrollbar-track {    -webkit-box-shadow: inset 0 0 6px #7a99d9;    border-radius: 10px;}
+滚动条滑块
+::-webkit-scrollbar-thumb {    border-radius: 10px;    background: #7a99d9;    -webkit-box-shadow: inset 0 0 6px #7a99d9;}
+::-webkit-scrollbar-thumb:window-inactive {    background: #7a99d9;}
+
+/*   Body {
+scrollbar-arrow-color: #f4ae21;  图6,三角箭头的颜色
+scrollbar-face-color: #333;  图5,立体滚动条的颜色
+scrollbar-3dlight-color: #666;  图1,立体滚动条亮边的颜色
+scrollbar-highlight-color: #666;  图2,滚动条空白部分的颜色
+scrollbar-shadow-color: #999;  图3,立体滚动条阴影的颜色
+scrollbar-darkshadow-color: #666;  图4,立体滚动条强阴影的颜色
+scrollbar-track-color: #666;  图7,立体滚动条背景颜色
+
+scrollbar-base-color:#f8f8f8;  滚动条的基本颜色
+Cursor:url(mouse.cur);  自定义个性鼠标
+}  */
+
+#admin-side{
+	/*background-color:#800080;*/
+	background-image:url(../images/sidebar-5.jpg);
+}
+.layui-nav-item{
+	background-color:rgb(71,120,199);
+	color:#fff;
+	font-weight:bold;
+}
+.user-header{
+	background-color:rgba(255,255,255,0);
+}
+.admin-main{
+	margin: 15px;
+}
+.admin-main .layui-field-title .layui-field-box{
+	padding: 10px 30px;
+}
+.admin-main .layui-field-title .layui-field-box p{
+	padding: 5px 0;
+}
+.panel {
+	margin-top:-15px;
+	height:430px;
+	text-align: left
+    /*border:1px solid red;*/ 
+}
+
+
+.panel_top {
+	float:right; 
+	width:79.3%; 
+	height:20px;
+	padding:5px; 
+	background:#86b4fa;
+}
+
+.panel_center {
+	float:right; 
+	width:80%; 
+	border:1px solid rgba(150,150,100,0.3);
+    background-clip:padding-box;
+}
+
+.panel_center .panel_title {
+	padding-left: 10px; 
+	height: 28px;
+	line-height: 28px;
+	background-color: #E7F0FF;
+	border-bottom:1px solid rgba(150,150,100,0.3);
+}
+
+.panel_toolbar ul {
+	display: block;
+	height: 36px;
+	height: 36px;
+	line-height: 36px
+}
+
+.panel_toolbar li {
+	display: block;
+	float:left;
+	margin:  0 12px 0 4px;
+}
+
+
+
+.panel_center ul{
+	width:80%; 
+	height:30px;
+	padding-bottom:3px;
+}
+.panel_center ul li{
+	float:left;
+	padding-right:4px;
+	height:30px;
+}
+.panel_center_massage{
+	border:1px solid;
+	border-color: rgba(150,150,100,0.3) transparent rgba(150,150,100,0.3) transparent;
+    background-clip:padding-box;
+	height:20px;
+	font-size:10pt;
+	padding:4px 0 4px 0;
+	
+}
+.panel_center_srarch {
+	height:30px;
+	 /*border:1px solid red; */
+	padding-top:4px;
+}
+
+.panel_center_srarch input{
+	height:25px;
+	border-radius: 4px;
+}
+.panel_center_srarch select{
+	height:30px; 
+	border-radius: 4px; 
+	width:100px;
+}
+
+.admin-iframe{background:white;position:fixed;border-left:solid 1px #b5cfd9;right:0;bottom:0;top:80px;left:200px; overflow:auto; border-top:1px solid #b5cfd9;}
+
+a:hover{text-decoration:none}

@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="${s.base}/res/layui/css/layui.css"  media="all">
+<link rel="stylesheet" href="${s.base}/res/css/userDefine.css">
+
+<div class="ml15 mt15">
+	<form id="userForm" method="post" ENCTYPE="multipart/form-data">
+		<div class="layui-input-inline">
+			<input type="hidden" value="${userId!}" id="userId">
+			<input type="password" name="newPwd" id="newPwd"  
+				placeholder="新密码" autocomplete="off" class="layui-input mt15" value="">
+			<input type="password" name="newPwdConfirm" id="newPwdConfirm"  
+				placeholder="新密码确认" autocomplete="off" class="layui-input mt15" value="">
+		</div>
+	</form>
+
+	<div class ="mt15">
+		<a href="javascript:confirm()" class="layui-btn">确认</a>
+	</div>
+</div>
+
+<script src="${s.base}/res/layui/layui.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="${s.base}/res/jquery.form.js" charset="utf-8"></script>
+
+<script charset="utf-8">
+	function confirm(){		
+		if($('#newPwd').val() != $('#newPwdConfirm').val() ){
+			layui.use('layer', function(){
+				var layer = layui.layer;
+				layer.msg('两次输入的密码不一样');
+			});  
+			return;
+		}
+		
+		var options  = {    
+			url:'${s.base}/user/updateUser.html?newPwd='
+				+ $('#newPwd').val() + '&userId=' + $('#userId').val(),
+			data:null,
+		    type:'post',   
+		    success:function(data){
+		    	if (data == "true") {
+		    		layui.use('layer', function(){
+				    	var layer = layui.layer;
+		    			layer.msg('修改成功', {icon: 1, time: 2000}, function() {
+							parent.layer.closeAll();
+						});
+		    	    });
+		    	} else {
+		    		layui.use('layer', function(){
+				    	var layer = layui.layer;
+		    			layer.msg('修改失败', {icon: 2, time: 2000});
+		    	    });
+		    	}
+		    },
+			error:function(){
+			},
+			complete:function(){
+			}
+		};
+		
+		$("form[id='userForm']").ajaxSubmit(options);
+	}
+</script>
